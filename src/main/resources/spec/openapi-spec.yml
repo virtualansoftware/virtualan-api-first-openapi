@@ -1,0 +1,249 @@
+openapi: 3.0.2
+info:
+  title: Tasklist management API
+  description: This is the Tasklist management API
+  version: '0.1'
+servers:
+  - url: http://localhost:8080/tasklist-management/api
+
+
+tags:
+  - name: Projects
+    description: Operations with projects
+  - name: Tasks
+    description: Operations with tasks
+
+
+paths:
+
+  /projects:
+    post:
+      tags:
+        - Projects
+      summary: Creates a new project
+      operationId: createProject
+      requestBody:
+        description: Information about the project which will be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        201:
+          description: Project created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+
+    get:
+      tags:
+        - Projects
+      summary: Returns the list of existing projects
+      operationId: getProjects
+      responses:
+        200:
+          description: List of existing projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+
+
+  /projects/{project-id}:
+    get:
+      tags:
+        - Projects
+      summary: Returns a specific project
+      operationId: getProject
+      parameters:
+        - name: project-id
+          in: path
+          description: Id of the project to request
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Project found successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+
+    delete:
+      tags:
+        - Projects
+      summary: Deletes a specific project
+      operationId: deleteProject
+      parameters:
+        - name: project-id
+          in: path
+          description: Id of the project to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Project deleted successfully
+
+
+  /projects/{project-id}/tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Returns the list of tasks which belong to a project
+      operationId: getTasks
+      parameters:
+        - name: project-id
+          in: path
+          description: Id of the project to request
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Tasks found successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+
+  /projects/{project-id}/tasks/{task-id}:
+    get:
+      tags:
+        - Tasks
+      summary: Returns a specific task
+      operationId: getTask
+      parameters:
+        - name: project-id
+          in: path
+          description: Id of the project to request
+          required: true
+          schema:
+            type: integer
+        - name: task-id
+          in: path
+          description: Id of the task to request
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Task found successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+
+    delete:
+      tags:
+        - Tasks
+      summary: Deletes a specific task
+      operationId: deleteTask
+      parameters:
+        - name: project-id
+          in: path
+          description: Id of the project to request
+          required: true
+          schema:
+            type: integer
+        - name: task-id
+          in: path
+          description: Id of the task to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Task deleted successfully
+
+  /projects/{project-id}/tasks/{task-id}/info:
+    patch:
+      tags:
+        - Tasks
+      summary: Modify the information of a specific task
+      operationId: modifyTask
+      parameters:
+        - name: project-id
+          in: path
+          description: Id of the project to request
+          required: true
+          schema:
+            type: integer
+        - name: task-id
+          in: path
+          description: Id of the task to modify
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Information about the project which will be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInformation'
+      responses:
+        200:
+          description: Task modified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+
+components:
+  schemas:
+
+    Project:
+      type: object
+      required:
+        - title
+      properties:
+        projectId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+
+    Task:
+      type: object
+      required:
+        - title
+      properties:
+        taskId:
+          type: integer
+        information:
+          $ref: '#/components/schemas/TaskInformation'
+        creationDate:
+          type: string
+          format: date
+        modificationDate:
+          type: string
+          format: date
+
+    TaskInformation:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+            - CREATED
+            - IN PROGRESS
+            - FINISHED
